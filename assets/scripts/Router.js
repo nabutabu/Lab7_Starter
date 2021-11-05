@@ -12,18 +12,23 @@
   *     easily modify the URL without refreshing the page or anything
   */
 
-export class Router {
+ export class Router {
   /**
    * Sets up the home function, the page name should always be 'home', which
    * is why no page name variable is passed in.
    * @param {Function} homeFunc The function to run to set the home route
    *                            visually
    */
+
   constructor(homeFunc) {
     /**
      * TODO Part 1
      * Fill in this function as specified in the comment above
      */
+    this.routes = {};
+    this.routes['home'] = homeFunc;
+    //this.addPage('home', homeFunc);
+
   }
 
   /**
@@ -38,6 +43,7 @@ export class Router {
      * TODO Part 1
      * Fill in this function as specified in the comment above
      */
+    this.routes[page] = pageFunc;
   }
 
   /**
@@ -52,5 +58,18 @@ export class Router {
      * TODO Part 1
      * Fill in this function as specified in the comment above
      */
+    // Call stored function
+    this.routes[page]();
+
+    // push state to history
+    if (!statePopped)
+      history.pushState({'pageName': page}, page, page == 'home' ? '' : '#' + page)
+
+    // update location
+    if (page == 'home')
+      location.hash = '';
+    else
+      location.hash = page;
+
   }
 }
