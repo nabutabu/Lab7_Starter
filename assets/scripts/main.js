@@ -53,7 +53,7 @@ async function init() {
   // as minimizes the amount of "page flashing" from the home --> new page
   let page = window.location.hash.slice(1);
   if (page == '') page = 'home';
-  router.navigate(page);
+  router.navigate(page, true);
 }
 
 /**
@@ -65,6 +65,13 @@ function initializeServiceWorker() {
    *  TODO - Part 2
    *  Initialize the service worker set up in sw.js
    */
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(function (reg) {
+      console.log('Service Worker Registered');
+    }).catch(function (err) {
+      console.log('Service Worker Failed to Register', err);
+    });
+  }
 }
 
 /**
@@ -166,16 +173,11 @@ function bindShowMore() {
  *                             listeners to
  * @param {String} pageName the name of the page to navigate to on click
  */
-function bindRecipeCard(recipeCard, pageName) {
-  /**
-   * TODO - Part 1
-   * Fill in this function as specified in the comment above
-   */
-
-  recipeCard.addEventListener('click', () => {
-    router.navigate(pageName, false);
+ function bindRecipeCard(recipeCard, pageName) {
+  recipeCard.addEventListener('click', e => {
+    if (e.path[0].nodeName == 'A') return;
+    router.navigate(pageName);
   });
-
 }
 
 /**
@@ -206,8 +208,12 @@ function bindPopstate() {
    * TODO - Part 1
    * Fill in this function as specified in the comment above
    */
-  window.onpopstate = (event) => {
-    router.navigate(event.state.pageName, true);
+  
+  window.onpopstate = function(event) {
+    console.log(event);
+    if(event.state)
+      router.navigate(event.state.pageName, true);
+    else
+      router.navigate('home', true);
   }
-
 }

@@ -54,22 +54,31 @@
    *                              'popstate' event instead of a normal card click
    */
   navigate(page, statePopped) {
+    console.log('navigate to ' + page);
     /**
      * TODO Part 1
      * Fill in this function as specified in the comment above
      */
     // Call stored function
-    this.routes[page]();
+    if (!this.routes[page]) {
+      console.log('No route for ' + page);
+      return;
+    }
 
+    var hash;
+    if(page == 'home') {
+      hash = '';
+    } else {
+      hash = '#' + page;
+    }
+    
+    console.log('hash:' + hash);
     // push state to history
-    if (!statePopped)
-      history.pushState({'pageName': page}, page, page == 'home' ? '' : '#' + page)
-
+    if (!statePopped && window.location.hash !== hash) {
+      window.history.pushState({'pageName': page}, page, window.location.pathname + hash);
+    } 
+    
     // update location
-    if (page == 'home')
-      location.hash = '';
-    else
-      location.hash = page;
-
+    this.routes[page]();
   }
 }
