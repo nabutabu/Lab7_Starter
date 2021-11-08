@@ -66,12 +66,53 @@ function initializeServiceWorker() {
    *  Initialize the service worker set up in sw.js
    */
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(function (reg) {
+    navigator.serviceWorker.register('sw.js').
+    then(function (reg) {
       console.log('Service Worker Registered');
     }).catch(function (err) {
       console.log('Service Worker Failed to Register', err);
     });
   }
+
+  self.addEventListener('install', function(event) {
+    // Perform install steps
+    var CACHE_NAME = 'my-site-cache-v1';
+    var urlsToCache = [
+      '/',
+      '/styles/main.css',
+      '/script/main.js'
+    ];
+
+    self.addEventListener('install', function(event) {
+      // Perform install steps
+      event.waitUntil(
+        caches.open(CACHE_NAME)
+          .then(function(cache) {
+            console.log('Opened cache');
+            return cache.addAll(urlsToCache);
+          })
+      );
+    });
+  });
+
+  self.addEventListener('fetch', function(event) {
+    event.respondWith(
+      caches.match(event.request)
+        .then(function(response) {
+          // Cache hit - return response
+          console.log("Fetch hit");
+          if (response) {
+            return response;
+          }
+          return fetch(event.request);
+        }
+      )
+    );
+  });
+
+  self.addEventListener('activate', event => {
+    event.waitUntil(clients.claim());
+  });  
 }
 
 /**
